@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lost Letters of Kingdom</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:wght@400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#11100d;color:#f3e4c0;font-family:'Crimson Text',serif}
+.screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:25px}
+#home{text-align:center;background:radial-gradient(ellipse at 50% 35%,#66513d 0%,#382b32 38%,#17121b 78%,#09090d 100%);position:relative;overflow:hidden}
+#home:before{content:"🏰";position:absolute;font-size:clamp(120px,25vw,280px);opacity:.17;top:9%;left:50%;transform:translateX(-50%)}
+#home:after{content:"✦  ✧  ✦  ✧  ✦";position:absolute;bottom:9%;color:#e8cc8a;letter-spacing:18px;opacity:.55}
+#home>*{position:relative}
+.subtitle{letter-spacing:5px;color:#e0bf79;font-size:13px}
+h1{font-family:'Cinzel',serif;font-size:clamp(32px,6vw,65px);color:#f0d99a;margin:20px 0;text-shadow:0 3px 15px black}
+.description{font-size:19px;max-width:520px;line-height:1.7;margin-bottom:28px}
+button{font-family:'Cinzel',serif;background:#986c46;border:1px solid #e7c77c;padding:12px 22px;color:#fff7e6;cursor:pointer;transition:.3s;margin:5px}
+button:hover{background:#bd925c;transform:translateY(-2px)}
+#game{display:none;background:radial-gradient(ellipse at center,#49364a,#211b2d 75%,#0b0b13)}
+.game-title{font-family:'Cinzel',serif;color:#f0d99a;margin-bottom:15px;text-align:center}
+.stats{margin-bottom:15px;font-size:18px}
+#world{width:min(90vw,720px);height:min(58vw,420px);min-height:280px;position:relative;overflow:hidden;border:5px solid #c19a5b;background:
+radial-gradient(ellipse at 50% 45%,#71805b 0%,#435b43 52%,#263b34 100%);
+box-shadow:0 0 30px #000}
+#world:before{content:"🏰";position:absolute;top:9px;left:50%;transform:translateX(-50%);font-size:65px}
+#world:after{content:"✦       ✧        ✦       ✧";position:absolute;bottom:20px;left:8%;font-size:22px;color:#f0d99a88;letter-spacing:15px;pointer-events:none}
+#player{position:absolute;z-index:5;left:40px;top:180px;width:46px;height:58px;display:flex;align-items:center;justify-content:center;font-size:39px;filter:drop-shadow(0 4px 5px #17101b);user-select:none;transition:left .09s,top .09s}
+#player:after{content:"";position:absolute;bottom:0;width:27px;height:8px;border-radius:50%;background:#17101b66;z-index:-1}
+.scroll{position:absolute;font-size:29px;animation:glow 1.5s infinite alternate;z-index:4}
+@keyframes glow{from{filter:drop-shadow(0 0 3px gold)}to{filter:drop-shadow(0 0 14px gold)}}
+#scroll1{left:190px;top:90px}#scroll2{left:420px;top:270px}#scroll3{left:calc(100% - 55px);top:100px}
+.instruction{text-align:center;margin:15px;line-height:1.6}
+.controls{display:grid;grid-template-columns:repeat(3,50px);gap:5px;margin-top:10px}
+.controls button{padding:10px;margin:0}
+.collection{margin-top:12px;text-align:center}
+.music-control{margin-top:10px}
+#letterModal,#collectionModal{display:none;position:fixed;inset:0;z-index:10;background:#000d;align-items:center;justify-content:center;padding:20px}
+.letter{background:#ead9b6;color:#392b1d;max-width:520px;width:100%;padding:40px 35px;border:8px double #98713a;box-shadow:0 0 50px #000;animation:openLetter .6s ease}
+@keyframes openLetter{from{opacity:0;transform:scale(.7) rotateX(30deg)}to{opacity:1;transform:scale(1) rotateX(0)}}
+.letter h2{font-family:'Cinzel',serif;text-align:center;margin-bottom:25px;color:#765025}
+.letter p{font-size:19px;line-height:1.8;margin-bottom:15px;white-space:pre-line}
+.signature{text-align:right;font-style:italic;margin-top:25px}
+.collection-panel{background:#292235;border:2px solid #c19a5b;padding:30px;max-width:450px;width:100%;text-align:center}
+.collection-panel h2{font-family:'Cinzel',serif;color:#f0d99a;margin-bottom:18px}
+.collection-panel li{list-style:none;padding:9px;border-bottom:1px solid #ffffff22;cursor:pointer}
+.collection-panel li:hover{color:#f0d99a}
+@media(max-width:500px){.letter{padding:25px 20px}.letter p{font-size:17px}#world{min-height:280px}}
+</style>
+</head>
+<body>
+<section id="home" class="screen">
+  <p class="subtitle">A KINGDOM • A SECRET • A STORY</p>
+  <h1>THE LOST LETTERS<br>OF KINGDOM</h1>
+  <p class="description">Jadilah seorang putri yang menjelajahi kerajaan untuk menemukan tiga surat rahasia. Setiap surat menyimpan potongan kisah yang telah lama tersembunyi.</p>
+  <button onclick="startGame()">ENTER THE KINGDOM</button>
+  <p style="margin-top:18px;color:#e0c58e">♛ A Royal Fairytale Adventure ♛</p>
+  <button id="homeMusic" onclick="toggleMusic()">♫ PLAY ROYAL MUSIC</button>
+</section>
+
+<section id="game" class="screen">
+  <h2 class="game-title">THE FORGOTTEN KINGDOM</h2>
+  <div class="stats">📜 Surat ditemukan: <span id="score">0</span> / 3</div>
+  <div id="world">
+    <div id="player" title="Princess">👸🏻</div>
+    <div class="scroll" id="scroll1">📜</div>
+    <div class="scroll" id="scroll2">📜</div>
+    <div class="scroll" id="scroll3">📜</div>
+  </div>
+  <p class="instruction">Gerakkan sang putri dengan tombol WASD atau tanda panah.<br>Dekati gulungan surat untuk mengambilnya.</p>
+  <div class="controls" aria-label="Kontrol karakter">
+    <span></span><button onclick="move(0,-25)">▲</button><span></span>
+    <button onclick="move(-25,0)">◀</button><button onclick="move(0,25)">▼</button><button onclick="move(25,0)">▶</button>
+  </div>
+  <div class="collection"><button onclick="showCollection()">ROYAL LETTER COLLECTION</button></div>
+  <div class="music-control"><button id="gameMusic" onclick="toggleMusic()">♫ PLAY ROYAL MUSIC</button></div>
+</section>
+
+<div id="letterModal" role="dialog" aria-modal="true" aria-labelledby="letterTitle">
+  <div class="letter">
+    <h2 id="letterTitle">A Royal Letter</h2>
+    <p id="letterContent"></p>
+    <div class="signature" id="signature"></div>
+    <center><button onclick="closeLetter()">CLOSE LETTER</button></center>
+  </div>
+</div>
+<div id="collectionModal" role="dialog" aria-modal="true">
+  <div class="collection-panel">
+    <h2>THE ROYAL ARCHIVE</h2>
+    <ul id="collectionList"></ul>
+    <button onclick="closeCollection()">CLOSE</button>
+  </div>
+</div>
+
+<script>
+const player=document.getElementById("player");
+const world=document.getElementById("world");
+let x=40,y=180;
+const collected=[];
+let audioContext=null, musicTimer=null, musicOn=false, noteIndex=0;
+
+// Melodi orisinal bergaya istana: harpsichord-like pluck dan pad lembut.
+const melody=[392,494,587,784,659,587,494,440,523,659,784,659,587,523,494,392];
+const bass=[196,147,174,130];
+function playTone(freq,duration,when,type="triangle",gain=.055){
+ const osc=audioContext.createOscillator();
+ const amp=audioContext.createGain();
+ osc.type=type; osc.frequency.setValueAtTime(freq,when);
+ amp.gain.setValueAtTime(.0001,when);
+ amp.gain.exponentialRampToValueAtTime(gain,when+.035);
+ amp.gain.exponentialRampToValueAtTime(.0001,when+duration);
+ osc.connect(amp);amp.connect(audioContext.destination);
+ osc.start(when);osc.stop(when+duration+.03);
+}
+function musicStep(){
+ if(!musicOn||!audioContext)return;
+ const now=audioContext.currentTime;
+ const n=noteIndex%melody.length;
+ playTone(melody[n],.48,now,"triangle",.045);
+ if(n%4===0){
+  playTone(bass[(n/4)%bass.length],1.35,now,"sine",.035);
+  playTone(melody[n]*1.5, .8, now,"sine",.012);
+ }
+ noteIndex++;
+}
+async function toggleMusic(){
+ if(!audioContext)audioContext=new (window.AudioContext||window.webkitAudioContext)();
+ if(audioContext.state==="suspended")await audioContext.resume();
+ musicOn=!musicOn;
+ if(musicOn){musicStep();musicTimer=setInterval(musicStep,430);}
+ else{clearInterval(musicTimer);musicTimer=null;}
+ updateMusicButtons();
+}
+function updateMusicButtons(){
+ const label=musicOn?"♫ PAUSE ROYAL MUSIC":"♫ PLAY ROYAL MUSIC";
+ document.getElementById("homeMusic").textContent=label;
+ document.getElementById("gameMusic").textContent=label;
+}
+const letters=[
+ {title:"The First Letter",content:"Kepada seseorang yang mungkin tidak pernah menyadari keberadaanku.\\n\\nDi antara ribuan orang yang berlalu di kerajaan ini, ada satu sosok yang selalu berhasil menarik perhatianku.\\n\\nAku tidak tahu bagaimana menjelaskannya. Namun, sejak saat itu, dunia terasa sedikit berbeda.",signature:"— The Princess"},
+ {title:"The Second Letter",content:"Wahai penjelajah istana,\\n\\nTidak semua hal indah harus dimiliki untuk bisa dikenang. Terkadang sebuah pertemuan sederhana mampu meninggalkan cerita yang bertahan sangat lama.\\n\\nJika kau membaca surat ini, berarti perjalananmu belum sia-sia.",signature:"— Dengan tulus, Sang Putri"},
+ {title:"The Final Letter",content:"Untukmu, yang telah sampai sejauh ini.\\n\\nDi balik mahkota dan kemegahan istana, aku hanyalah seseorang yang ingin kisahnya didengar.\\n\\nTerima kasih telah menemukan semua surat ini. Semoga setelah halaman terakhir, kau tetap percaya bahwa setiap perjalanan memiliki keajaibannya sendiri.",signature:"— Sang Putri, dari Kerajaan"},
+];
+function startGame(){
+ document.getElementById("home").style.display="none";
+ document.getElementById("game").style.display="flex";
+}
+function move(dx,dy){
+ const maxX=world.clientWidth-48,maxY=world.clientHeight-58;
+ x=Math.max(0,Math.min(maxX,x+dx));y=Math.max(0,Math.min(maxY,y+dy));
+ player.style.left=x+"px";player.style.top=y+"px";checkCollision();
+}
+document.addEventListener("keydown",e=>{
+ if(document.getElementById("game").style.display!=="flex")return;
+ const key=e.key.toLowerCase();
+ if(["arrowup","arrowdown","arrowleft","arrowright"," "].includes(key))e.preventDefault();
+ if(key==="arrowup"||key==="w")move(0,-25);
+ if(key==="arrowdown"||key==="s")move(0,25);
+ if(key==="arrowleft"||key==="a")move(-25,0);
+ if(key==="arrowright"||key==="d")move(25,0);
+});
+function checkCollision(){
+ for(let i=1;i<=3;i++){
+  const scroll=document.getElementById("scroll"+i);
+  if(scroll.style.display==="none")continue;
+  if(Math.hypot((x+20)-(scroll.offsetLeft+10),(y+25)-(scroll.offsetTop+10))<48)collectLetter(i);
+ }
+}
+function collectLetter(id){
+ if(collected.includes(id))return;
+ collected.push(id);
+ document.getElementById("scroll"+id).style.display="none";
+ document.getElementById("score").textContent=collected.length;
+ openLetter(id);
+}
+function openLetter(id){
+ const letter=letters[id-1];
+ document.getElementById("letterTitle").textContent=letter.title;
+ document.getElementById("letterContent").textContent=letter.content;
+ document.getElementById("signature").textContent=letter.signature;
+ document.getElementById("letterModal").style.display="flex";
+}
+function closeLetter(){
+ document.getElementById("letterModal").style.display="none";
+ if(collected.length===3)setTimeout(()=>alert("Selamat, Putri! Semua surat kerajaan telah ditemukan."),250);
+}
+function showCollection(){
+ const list=document.getElementById("collectionList");list.innerHTML="";
+ if(!collected.length){const li=document.createElement("li");li.textContent="Belum ada surat yang ditemukan.";list.appendChild(li);}
+ collected.forEach(id=>{
+  const li=document.createElement("li");li.textContent="📜 "+letters[id-1].title;
+  li.onclick=()=>{closeCollection();openLetter(id)};list.appendChild(li);
+ });
+ document.getElementById("collectionModal").style.display="flex";
+}
+function closeCollection(){document.getElementById("collectionModal").style.display="none"}
+</script>
+</body>
+</html>
